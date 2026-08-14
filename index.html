@@ -2,25 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>ResumeScore — Free ATS Resume Checker</title>
 
   <meta
     name="description"
-    content="Analyze your resume for ATS readiness, keywords, sections and job compatibility."
+    content="Analyze your resume for ATS readiness, keywords, formatting and job compatibility."
   />
 
-  <!-- IMPORTANT: your actual GitHub filename is styles.css -->
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="style.css" />
 
-  <!-- PDF.js -->
+  <!-- PDF.js - stable classic build -->
   <script
-    type="module"
-    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs">
+    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js">
   </script>
 
   <!-- DOCX reader -->
@@ -31,503 +26,599 @@
 
 <body>
 
-  <!-- =====================================================
-       NAVBAR
-       ===================================================== -->
-
+  <!-- NAVBAR -->
   <header class="navbar">
+    <div class="nav-inner">
 
-    <div class="logo">
-      Resume<span>Score</span>
+      <a class="brand" href="#">
+        <span class="brand-mark">R</span>
+        <span>Resume<span class="brand-blue">Score</span></span>
+      </a>
+
+      <nav>
+        <a href="#how-it-works">How it works</a>
+        <a href="#checker">Check my resume</a>
+      </nav>
+
     </div>
-
-    <nav>
-      <a href="#how-it-works">How it works</a>
-      <a href="#reportSection">Your report</a>
-    </nav>
-
   </header>
 
 
+  <!-- HERO -->
   <main>
 
-    <!-- =====================================================
-         HERO
-         ===================================================== -->
+    <section class="hero" id="checker">
 
-    <section class="hero">
+      <div class="hero-inner">
 
-      <div class="eyebrow">
-        FREE ATS RESUME CHECKER
-      </div>
-
-      <h1>
-        Your resume should
-        <span>open doors.</span>
-      </h1>
-
-      <p class="hero-text">
-        Upload your resume and discover what's helping —
-        and what's hurting — your chances of getting past
-        ATS systems.
-      </p>
-
-      <div class="trust-row">
-        <span>✓ No signup</span>
-        <span>✓ PDF & DOCX</span>
-        <span>✓ Instant analysis</span>
-        <span>✓ Job-specific scoring</span>
-      </div>
-
-
-      <!-- ===================================================
-           ANALYZER
-           =================================================== -->
-
-      <div class="analyzer-card">
-
-        <div class="step-label">
-          STEP 1
+        <div class="eyebrow">
+          <span class="live-dot"></span>
+          FREE ATS RESUME CHECKER
         </div>
 
-        <h2>
-          Upload your resume
-        </h2>
+        <h1>
+          Make your resume
+          <span>impossible to ignore.</span>
+        </h1>
 
-        <div
-          class="upload-area"
-          id="uploadArea"
-        >
-
-          <div class="upload-icon">
-            ↑
-          </div>
-
-          <h3>
-            Drop your resume here
-          </h3>
-
-          <p>
-            or choose a file from your computer
-          </p>
-
-          <!-- IMPORTANT:
-               ID must match app.js -->
-          <input
-            type="file"
-            id="resumeFile"
-            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            hidden
-          />
-
-          <!-- IMPORTANT:
-               ID must match app.js -->
-          <button
-            type="button"
-            id="chooseBtn"
-            class="secondary-btn"
-          >
-            Choose resume
-          </button>
-
-          <div
-            class="file-name"
-            id="fileName"
-          >
-            PDF or DOCX • Max 5MB
-          </div>
-
-        </div>
-
-
-        <!-- =================================================
-             JOB DESCRIPTION
-             ================================================= -->
-
-        <div class="step-label">
-          STEP 2
-        </div>
-
-        <div class="job-heading">
-
-          <h3>
-            Add a job description
-          </h3>
-
-          <span>
-            OPTIONAL
-          </span>
-
-        </div>
-
-        <p class="job-help">
-          Add the job you're applying for and we'll check
-          keyword compatibility.
+        <p class="hero-subtitle">
+          Upload your resume and discover what is helping —
+          and what is hurting — your chances of getting past ATS systems.
         </p>
 
-        <textarea
-          id="jobDescription"
-          placeholder="Paste the job description here..."
-          rows="6"
-        ></textarea>
+        <div class="trust-row">
+          <span>✓ No signup</span>
+          <span>✓ PDF & DOCX</span>
+          <span>✓ Private analysis</span>
+          <span>✓ Job-specific scoring</span>
+        </div>
 
 
-        <!-- =================================================
-             ANALYZE
-             ================================================= -->
+        <!-- CHECKER CARD -->
+        <div class="checker-card">
 
-        <button
-          type="button"
-          id="analyzeBtn"
-          class="primary-btn"
-        >
-          Analyze my resume →
-        </button>
+          <!-- STEP HEADER -->
+          <div class="step-header">
+            <div class="step-number">01</div>
 
-        <div
-          class="status"
-          id="status"
-          aria-live="polite"
-        ></div>
+            <div>
+              <div class="step-label">STEP 1</div>
+              <h2>Upload your resume</h2>
+              <p>Your file stays in your browser during analysis.</p>
+            </div>
+
+            <div class="privacy-pill">
+              🔒 Private
+            </div>
+          </div>
+
+
+          <!-- UPLOAD -->
+          <div
+            class="upload-zone"
+            id="uploadArea"
+          >
+
+            <input
+              type="file"
+              id="resumeFile"
+              accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            />
+
+            <div class="upload-icon">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 16V4M12 4L7 9M12 4L17 9"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M5 13V18C5 19.1046 5.89543 20 7 20H17C18.1046 20 19 19.1046 19 18V13"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+
+            <h3>Drop your resume here</h3>
+
+            <p>
+              or
+              <button
+                type="button"
+                class="browse-button"
+                id="chooseBtn"
+              >
+                browse files
+              </button>
+            </p>
+
+            <span class="upload-hint">
+              PDF or DOCX · Maximum 5MB
+            </span>
+
+          </div>
+
+
+          <!-- SELECTED FILE -->
+          <div
+            class="selected-file hidden"
+            id="selectedFile"
+          >
+            <div class="file-icon">PDF</div>
+
+            <div class="file-info">
+              <strong id="fileName">resume.pdf</strong>
+              <span id="fileSize">0 KB</span>
+            </div>
+
+            <button
+              type="button"
+              id="removeFile"
+              class="remove-file"
+              aria-label="Remove file"
+            >
+              ×
+            </button>
+          </div>
+
+
+          <!-- STEP 2 -->
+          <div class="step-divider"></div>
+
+          <div class="step-header compact">
+
+            <div class="step-number">02</div>
+
+            <div>
+              <div class="step-label">OPTIONAL</div>
+              <h2>Add a job description</h2>
+              <p>We'll compare your resume against the role.</p>
+            </div>
+
+          </div>
+
+
+          <textarea
+            id="jobDescription"
+            class="job-input"
+            placeholder="Paste the job description here..."
+          ></textarea>
+
+
+          <!-- ANALYZE -->
+          <button
+            type="button"
+            class="analyze-button"
+            id="analyzeBtn"
+          >
+            <span>Analyze my resume</span>
+
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M5 12H19M19 12L13 6M19 12L13 18"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+
+
+          <!-- STATUS -->
+          <div
+            class="status-message"
+            id="status"
+          ></div>
+
+        </div>
 
       </div>
 
     </section>
 
 
-    <!-- =====================================================
-         REPORT
-         ===================================================== -->
+    <!-- ANALYZING SCREEN -->
+    <section
+      class="analysis-loading hidden"
+      id="loadingSection"
+    >
 
+      <div class="loading-card">
+
+        <div class="loading-logo">
+          <span>R</span>
+        </div>
+
+        <div class="loading-eyebrow">
+          RESUMESCORE ANALYSIS
+        </div>
+
+        <h2 id="loadingTitle">
+          Reading your resume
+        </h2>
+
+        <p id="loadingText">
+          Extracting content and checking ATS signals...
+        </p>
+
+        <div class="loading-progress">
+          <div id="loadingBar"></div>
+        </div>
+
+        <div class="loading-steps">
+
+          <div class="loading-step active" id="loadStep1">
+            <span>✓</span>
+            Reading resume
+          </div>
+
+          <div class="loading-step" id="loadStep2">
+            <span>2</span>
+            Checking ATS structure
+          </div>
+
+          <div class="loading-step" id="loadStep3">
+            <span>3</span>
+            Matching keywords
+          </div>
+
+          <div class="loading-step" id="loadStep4">
+            <span>4</span>
+            Building your report
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- REPORT -->
     <section
       class="report-section hidden"
       id="reportSection"
     >
 
-      <div class="section-label">
-        YOUR ATS READINESS
-      </div>
+      <div class="report-inner">
 
-      <div class="report-heading">
+        <div class="report-top">
 
-        <div>
-          <h2>
-            Your resume report
-          </h2>
-        </div>
+          <div>
+            <div class="section-eyebrow">
+              YOUR RESUME REPORT
+            </div>
 
-        <button
-          type="button"
-          class="text-btn"
-          id="analyzeAnother"
-        >
-          Analyze another →
-        </button>
+            <h2>Here's what we found.</h2>
 
-      </div>
-
-
-      <!-- ===================================================
-           SCORE CARD
-           =================================================== -->
-
-      <div class="score-card">
-
-        <div>
-
-          <div class="small-label">
-            ATS READINESS
+            <p>
+              Your resume has been analyzed for ATS compatibility,
+              structure and job relevance.
+            </p>
           </div>
 
-          <div class="score-number">
-
-            <span id="overallScore">
-              0
-            </span>
-
-            <small>
-              /100
-            </small>
-
-          </div>
-
-          <p id="scoreMessage">
-            Upload a resume to begin.
-          </p>
-
-        </div>
-
-
-        <div class="score-circle">
-
-          <span id="circleScore">
-            0
-          </span>
-
-        </div>
-
-      </div>
-
-
-      <!-- ===================================================
-           BREAKDOWN
-           =================================================== -->
-
-      <div class="breakdown-grid">
-
-        <div class="metric-card">
-
-          <span>
-            Keywords
-          </span>
-
-          <strong id="keywordScore">
-            0
-          </strong>
-
-          <div class="progress">
-            <div id="keywordBar"></div>
-          </div>
-
-        </div>
-
-
-        <div class="metric-card">
-
-          <span>
-            Sections
-          </span>
-
-          <strong id="sectionScore">
-            0
-          </strong>
-
-          <div class="progress">
-            <div id="sectionBar"></div>
-          </div>
-
-        </div>
-
-
-        <div class="metric-card">
-
-          <span>
-            Contact
-          </span>
-
-          <strong id="contactScore">
-            0
-          </strong>
-
-          <div class="progress">
-            <div id="contactBar"></div>
-          </div>
-
-        </div>
-
-
-        <div class="metric-card">
-
-          <span>
-            Formatting
-          </span>
-
-          <strong id="formatScore">
-            0
-          </strong>
-
-          <div class="progress">
-            <div id="formatBar"></div>
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- ===================================================
-           PROBLEMS + RECOMMENDATIONS
-           =================================================== -->
-
-      <div class="report-grid">
-
-        <div class="report-box">
-
-          <h3>
-            ⚠ Problems found
-          </h3>
-
-          <ul id="problemsList">
-
-            <li>
-              Upload your resume to see problems.
-            </li>
-
-          </ul>
-
-        </div>
-
-
-        <div class="report-box">
-
-          <h3>
-            ✓ How to improve
-          </h3>
-
-          <ul id="recommendationsList">
-
-            <li>
-              Your recommendations will appear here.
-            </li>
-
-          </ul>
-
-        </div>
-
-      </div>
-
-
-      <!-- ===================================================
-           KEYWORDS
-           =================================================== -->
-
-      <div class="keywords-box">
-
-        <div class="keywords-column">
-
-          <h3>
-            ✓ Matched keywords
-          </h3>
-
-          <div
-            class="keyword-list"
-            id="matchedKeywords"
+          <button
+            type="button"
+            class="analyze-again"
+            id="analyzeAnother"
           >
-            —
+            Analyze another →
+          </button>
+
+        </div>
+
+
+        <!-- SCORE -->
+        <div class="score-card">
+
+          <div class="score-left">
+
+            <div class="score-label">
+              ATS READINESS
+            </div>
+
+            <div class="score-row">
+
+              <span
+                class="score-number"
+                id="overallScore"
+              >
+                0
+              </span>
+
+              <span class="score-max">
+                /100
+              </span>
+
+            </div>
+
+            <p id="scoreMessage">
+              Upload a resume to begin.
+            </p>
+
+          </div>
+
+
+          <div class="score-ring">
+
+            <svg viewBox="0 0 120 120">
+
+              <circle
+                class="ring-bg"
+                cx="60"
+                cy="60"
+                r="50"
+              />
+
+              <circle
+                class="ring-progress"
+                id="scoreRing"
+                cx="60"
+                cy="60"
+                r="50"
+              />
+
+            </svg>
+
+            <div class="ring-value">
+              <strong id="circleScore">0</strong>
+              <span>/100</span>
+            </div>
+
           </div>
 
         </div>
 
 
-        <div class="keywords-column">
+        <!-- METRICS -->
+        <div class="metrics-grid">
 
-          <h3>
-            ✕ Missing keywords
-          </h3>
+          <div class="metric-card">
+            <div class="metric-top">
+              <span>Keywords</span>
+              <strong id="keywordScore">0</strong>
+            </div>
 
-          <div
-            class="keyword-list missing"
-            id="missingKeywords"
+            <div class="metric-track">
+              <div id="keywordBar"></div>
+            </div>
+
+            <small>Keyword relevance</small>
+          </div>
+
+
+          <div class="metric-card">
+            <div class="metric-top">
+              <span>Sections</span>
+              <strong id="sectionScore">0</strong>
+            </div>
+
+            <div class="metric-track">
+              <div id="sectionBar"></div>
+            </div>
+
+            <small>Resume structure</small>
+          </div>
+
+
+          <div class="metric-card">
+            <div class="metric-top">
+              <span>Contact</span>
+              <strong id="contactScore">0</strong>
+            </div>
+
+            <div class="metric-track">
+              <div id="contactBar"></div>
+            </div>
+
+            <small>Contact information</small>
+          </div>
+
+
+          <div class="metric-card">
+            <div class="metric-top">
+              <span>Formatting</span>
+              <strong id="formatScore">0</strong>
+            </div>
+
+            <div class="metric-track">
+              <div id="formatBar"></div>
+            </div>
+
+            <small>ATS readability</small>
+          </div>
+
+        </div>
+
+
+        <!-- PROBLEMS -->
+        <div class="report-grid">
+
+          <div class="report-box problems">
+
+            <div class="box-heading">
+              <div class="box-icon warning">!</div>
+
+              <div>
+                <h3>Problems found</h3>
+                <p>Things worth fixing before applying.</p>
+              </div>
+            </div>
+
+            <ul id="problemsList"></ul>
+
+          </div>
+
+
+          <div class="report-box improvements">
+
+            <div class="box-heading">
+              <div class="box-icon success">✓</div>
+
+              <div>
+                <h3>How to improve</h3>
+                <p>Practical improvements for your resume.</p>
+              </div>
+            </div>
+
+            <ul id="recommendationsList"></ul>
+
+          </div>
+
+        </div>
+
+
+        <!-- KEYWORDS -->
+        <div class="keywords-section">
+
+          <div class="keyword-column">
+
+            <div class="keyword-heading">
+              <span class="keyword-dot matched"></span>
+
+              <div>
+                <h3>Matched keywords</h3>
+                <p>Keywords found in your resume.</p>
+              </div>
+            </div>
+
+            <div
+              class="keyword-list"
+              id="matchedKeywords"
+            ></div>
+
+          </div>
+
+
+          <div class="keyword-column">
+
+            <div class="keyword-heading">
+              <span class="keyword-dot missing"></span>
+
+              <div>
+                <h3>Missing keywords</h3>
+                <p>Useful terms missing from your resume.</p>
+              </div>
+            </div>
+
+            <div
+              class="keyword-list"
+              id="missingKeywords"
+            ></div>
+
+          </div>
+
+        </div>
+
+
+        <!-- CTA -->
+        <div class="report-cta">
+
+          <div>
+            <div class="cta-label">
+              NEXT STEP
+            </div>
+
+            <h3>
+              Want to improve your resume?
+            </h3>
+
+            <p>
+              Turn your current resume into a cleaner,
+              more ATS-friendly version.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onclick="alert('ATS Resume Builder is coming soon!')"
           >
-            —
-          </div>
+            Improve my resume
+            <span>→</span>
+          </button>
 
         </div>
-
-      </div>
-
-
-      <!-- ===================================================
-           CTA
-           =================================================== -->
-
-      <div class="cta">
-
-        <div>
-
-          <div class="small-label">
-            NEXT STEP
-          </div>
-
-          <h3>
-            Want us to improve your resume?
-          </h3>
-
-          <p>
-            Turn your existing resume into a cleaner,
-            ATS-friendly version.
-          </p>
-
-        </div>
-
-        <button
-          type="button"
-          onclick="alert('ATS Resume Builder coming soon!')"
-        >
-          Improve My Resume →
-        </button>
 
       </div>
 
     </section>
 
 
-    <!-- =====================================================
-         HOW IT WORKS
-         ===================================================== -->
-
+    <!-- HOW IT WORKS -->
     <section
       class="how-section"
       id="how-it-works"
     >
 
-      <div class="section-label">
-        HOW IT WORKS
-      </div>
+      <div class="how-inner">
 
-      <h2>
-        Resume → Score → Improve
-      </h2>
-
-      <div class="steps">
-
-        <div class="step">
-
-          <span>
-            01
-          </span>
-
-          <h3>
-            Upload
-          </h3>
-
-          <p>
-            Upload your PDF or DOCX resume.
-          </p>
-
+        <div class="section-eyebrow">
+          HOW IT WORKS
         </div>
 
+        <h2>
+          Resume → Analyze → Improve
+        </h2>
 
-        <div class="step">
-
-          <span>
-            02
-          </span>
-
-          <h3>
-            Analyze
-          </h3>
-
-          <p>
-            We check keywords, sections and ATS signals.
-          </p>
-
-        </div>
+        <p class="how-intro">
+          A simple three-step process designed to help
+          you submit a stronger application.
+        </p>
 
 
-        <div class="step">
+        <div class="how-grid">
 
-          <span>
-            03
-          </span>
+          <div class="how-card">
 
-          <h3>
-            Improve
-          </h3>
+            <span class="how-number">01</span>
 
-          <p>
-            Get actionable recommendations.
-          </p>
+            <div class="how-icon">↑</div>
+
+            <h3>Upload</h3>
+
+            <p>
+              Upload your PDF or DOCX resume.
+              No account required.
+            </p>
+
+          </div>
+
+
+          <div class="how-card">
+
+            <span class="how-number">02</span>
+
+            <div class="how-icon">⌕</div>
+
+            <h3>Analyze</h3>
+
+            <p>
+              We check structure, keywords,
+              contact details and ATS signals.
+            </p>
+
+          </div>
+
+
+          <div class="how-card">
+
+            <span class="how-number">03</span>
+
+            <div class="how-icon">↗</div>
+
+            <h3>Improve</h3>
+
+            <p>
+              Get clear recommendations that
+              you can act on immediately.
+            </p>
+
+          </div>
 
         </div>
 
@@ -538,30 +629,26 @@
   </main>
 
 
-  <!-- =====================================================
-       FOOTER
-       ===================================================== -->
-
+  <!-- FOOTER -->
   <footer>
 
-    <div>
-      Resume<span>Score</span>
-    </div>
+    <div class="footer-inner">
 
-    <div>
-      Free ATS Resume Checker
+      <div class="footer-brand">
+        <span class="brand-mark small">R</span>
+        <strong>ResumeScore</strong>
+      </div>
+
+      <span>
+        Free ATS Resume Checker
+      </span>
+
     </div>
 
   </footer>
 
 
-  <!-- =====================================================
-       IMPORTANT
-       Your actual JavaScript file is app.js
-       NOT script.js
-       ===================================================== -->
-
-  <script src="app.js" defer></script>
+  <script src="script.js"></script>
 
 </body>
 </html>
