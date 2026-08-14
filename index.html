@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Free ATS Resume Checker | Resume Score</title>
+
+  <meta
+    name="description"
+    content="Upload your resume and get a free ATS resume score, mistakes and actionable recommendations."
+  >
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <header class="navbar">
+    <div class="logo">
+      Resume<span>Score</span>
+    </div>
+
+    <a href="#how-it-works">How it works</a>
+  </header>
+
+
+  <main>
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+      <div class="badge">
+        FREE ATS RESUME CHECKER
+      </div>
+
+      <h1>
+        Is your resume<br>
+        <span>ATS-friendly?</span>
+      </h1>
+
+      <p class="subtitle">
+        Upload your resume and get your ATS readiness score,
+        common mistakes and practical recommendations.
+      </p>
+
+
+      <!-- UPLOAD BOX -->
+
+      <div class="upload-box">
+
+        <input
+          type="file"
+          id="fileInput"
+          accept=".pdf,.docx"
+          hidden
+        >
+
+        <button
+          class="upload-button"
+          id="uploadButton"
+        >
+          Upload your resume
+        </button>
+
+        <p class="file-info">
+          PDF or DOCX · Maximum 5 MB
+        </p>
+
+        <p id="fileName"></p>
+
+        <button
+          class="analyze-button"
+          id="analyzeButton"
+          disabled
+        >
+          Check My Resume
+        </button>
+
+        <p id="status"></p>
+
+      </div>
+
+    </section>
+
+
+    <!-- RESULT -->
+
+    <section
+      id="result"
+      class="result hidden"
+    >
+
+      <div class="score-card">
+
+        <div>
+
+          <div class="small-heading">
+            YOUR RESUME SCORE
+          </div>
+
+          <div class="score">
+            <span id="score">0</span>
+            <small>/100</small>
+          </div>
+
+          <p id="scoreLabel"></p>
+
+        </div>
+
+        <div class="score-circle">
+          <span id="circleScore">0</span>
+        </div>
+
+      </div>
+
+
+      <div class="result-grid">
+
+        <div class="result-box">
+
+          <h2>
+            What we found
+          </h2>
+
+          <div id="issues"></div>
+
+        </div>
+
+
+        <div class="result-box">
+
+          <h2>
+            Recommendations
+          </h2>
+
+          <div id="recommendations"></div>
+
+        </div>
+
+      </div>
+
+
+      <div class="cta">
+
+        <h2>
+          Want a stronger ATS resume?
+        </h2>
+
+        <p>
+          Our next version will rewrite your resume and
+          match it against the job you're applying for.
+        </p>
+
+        <button
+          onclick="alert('Coming soon: AI Resume Rewrite')"
+        >
+          Get My ATS Resume
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- HOW IT WORKS -->
+
+    <section
+      class="how"
+      id="how-it-works"
+    >
+
+      <div class="badge">
+        HOW IT WORKS
+      </div>
+
+      <h2>
+        Resume → Score → Improve
+      </h2>
+
+
+      <div class="steps">
+
+        <div class="step">
+
+          <div class="number">
+            01
+          </div>
+
+          <h3>
+            Upload
+          </h3>
+
+          <p>
+            Upload your PDF or DOCX resume.
+          </p>
+
+        </div>
+
+
+        <div class="step">
+
+          <div class="number">
+            02
+          </div>
+
+          <h3>
+            Check
+          </h3>
+
+          <p>
+            We check common ATS-readiness signals.
+          </p>
+
+        </div>
+
+
+        <div class="step">
+
+          <div class="number">
+            03
+          </div>
+
+          <h3>
+            Improve
+          </h3>
+
+          <p>
+            Follow the recommendations to improve your resume.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <footer>
+    ResumeScore · Free ATS Resume Checker
+  </footer>
+
+
+  <!-- PDF READER -->
+
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs"
+    type="module"
+  ></script>
+
+  <!-- DOCX READER -->
+
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"
+  ></script>
+
+
+  <script src="app.js"></script>
+
+</body>
+</html>
