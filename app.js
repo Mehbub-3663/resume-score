@@ -1,181 +1,311 @@
-// ResumeScore V0.2 - Resume Analyzer
+// ==========================================
+// ResumeScore V0.4
+// ==========================================
 
-const fileInput = document.getElementById("resumeFile");
-const chooseBtn = document.getElementById("chooseBtn");
-const uploadArea = document.getElementById("uploadArea");
-const fileName = document.getElementById("fileName");
-const analyzeBtn = document.getElementById("analyzeBtn");
-const analyzeAnother = document.getElementById("analyzeAnother");
-const statusEl = document.getElementById("status");
+const fileInput =
+  document.getElementById("resumeFile");
+
+const chooseBtn =
+  document.getElementById("chooseBtn");
+
+const uploadArea =
+  document.getElementById("uploadArea");
+
+const fileName =
+  document.getElementById("fileName");
+
+const analyzeBtn =
+  document.getElementById("analyzeBtn");
+
+const analyzeAnother =
+  document.getElementById("analyzeAnother");
+
+const statusEl =
+  document.getElementById("status");
+
+const loadingSection =
+  document.getElementById("loadingSection");
+
+const reportSection =
+  document.getElementById("reportSection");
+
 
 let selectedFile = null;
+
 let resumeText = "";
 
 
-// ================================
-// FILE SELECTION
-// ================================
+// ==========================================
+// NORMALIZE
+// ==========================================
 
-chooseBtn.addEventListener("click", () => {
-  fileInput.click();
-});
+function normalizeText(text) {
 
-uploadArea.addEventListener("click", (event) => {
-  if (
-    event.target !== chooseBtn &&
-    !event.target.closest("button")
-  ) {
+  return String(text || "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+
+// ==========================================
+// FILE PICKER
+// ==========================================
+
+chooseBtn.addEventListener(
+  "click",
+  function (event) {
+
+    event.stopPropagation();
+
     fileInput.click();
   }
-});
-
-fileInput.addEventListener("change", async () => {
-  const file = fileInput.files[0];
-
-  if (!file) return;
-
-  handleFile(file);
-});
+);
 
 
-// ================================
-// DRAG & DROP
-// ================================
+uploadArea.addEventListener(
+  "click",
+  function (event) {
 
-uploadArea.addEventListener("dragover", (event) => {
-  event.preventDefault();
-  uploadArea.classList.add("dragging");
-});
+    if (
+      event.target !== chooseBtn &&
+      !event.target.closest("button")
+    ) {
 
-uploadArea.addEventListener("dragleave", () => {
-  uploadArea.classList.remove("dragging");
-});
-
-uploadArea.addEventListener("drop", (event) => {
-  event.preventDefault();
-
-  uploadArea.classList.remove("dragging");
-
-  const file = event.dataTransfer.files[0];
-
-  if (!file) return;
-
-  handleFile(file);
-});
+      fileInput.click();
+    }
+  }
+);
 
 
-// ================================
+fileInput.addEventListener(
+  "change",
+  async function () {
+
+    const file =
+      fileInput.files[0];
+
+    if (!file) return;
+
+    await handleFile(file);
+  }
+);
+
+
+// ==========================================
+// DRAG DROP
+// ==========================================
+
+uploadArea.addEventListener(
+  "dragover",
+  function (event) {
+
+    event.preventDefault();
+
+    uploadArea.classList.add(
+      "dragging"
+    );
+  }
+);
+
+
+uploadArea.addEventListener(
+  "dragleave",
+  function () {
+
+    uploadArea.classList.remove(
+      "dragging"
+    );
+  }
+);
+
+
+uploadArea.addEventListener(
+  "drop",
+  async function (event) {
+
+    event.preventDefault();
+
+    uploadArea.classList.remove(
+      "dragging"
+    );
+
+    const file =
+      event.dataTransfer.files[0];
+
+    if (!file) return;
+
+    await handleFile(file);
+  }
+);
+
+
+// ==========================================
 // HANDLE FILE
-// ================================
+// ==========================================
 
 async function handleFile(file) {
 
-  const allowedTypes = [
-    "application/pdf",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  ];
-
-  const extension = file.name.toLowerCase();
+  const name =
+    file.name.toLowerCase();
 
   const isPDF =
-    file.type === "application/pdf" ||
-    extension.endsWith(".pdf");
+    name.endsWith(".pdf");
 
   const isDOCX =
-    file.type ===
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-    extension.endsWith(".docx");
+    name.endsWith(".docx");
+
 
   if (!isPDF && !isDOCX) {
-    showStatus("Please upload a PDF or DOCX file.", true);
+
+    showStatus(
+      "Please upload a PDF or DOCX file.",
+      true
+    );
+
     return;
   }
 
-  if (file.size > 5 * 1024 * 1024) {
-    showStatus("File must be smaller than 5MB.", true);
+
+  if (
+    file.size >
+    5 * 1024 * 1024
+  ) {
+
+    showStatus(
+      "File must be smaller than 5MB.",
+      true
+    );
+
     return;
   }
+
 
   selectedFile = file;
 
-  fileName.textContent = file.name;
+  fileName.textContent =
+    file.name;
 
-  showStatus("Reading your resume...");
+
+  showStatus(
+    "Reading your resume..."
+  );
+
 
   try {
 
     if (isPDF) {
-      resumeText = await extractPDFText(file);
+
+      resumeText =
+        await extractPDFText(file);
+
     } else {
-      resumeText = await extractDOCXText(file);
+
+      resumeText =
+        await extractDOCXText(file);
     }
 
-    if (!resumeText.trim()) {
-      throw new Error("No readable text found.");
+
+    resumeText =
+      normalizeText(resumeText);
+
+
+    if (!resumeText) {
+
+      throw new Error(
+        "No readable text found."
+      );
     }
+
 
     showStatus(
-      `Resume loaded successfully ✓`
+      "Resume ready ✓"
     );
+
 
   } catch (error) {
 
     console.error(error);
 
+    selectedFile = null;
+
     resumeText = "";
 
     showStatus(
-      "Could not read this resume. Try another PDF or DOCX.",
+      "Could not read this resume. Try another file.",
       true
     );
   }
 }
 
 
-// ================================
-// PDF TEXT EXTRACTION
-// ================================
+// ==========================================
+// PDF
+// ==========================================
 
 async function extractPDFText(file) {
 
-  // Load PDF.js directly here.
-  // This avoids timing problems with module loading.
+  const pdfjsLib =
+    await import(
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs"
+    );
 
-  const pdfjsLib = await import(
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs"
-  );
 
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
+  pdfjsLib
+    .GlobalWorkerOptions
+    .workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
 
-  const arrayBuffer = await file.arrayBuffer();
 
-  const pdf = await pdfjsLib.getDocument({
-    data: arrayBuffer
-  }).promise;
+  const buffer =
+    await file.arrayBuffer();
+
+
+  const pdf =
+    await pdfjsLib.getDocument({
+      data: buffer
+    }).promise;
+
 
   let text = "";
 
-  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
 
-    const page = await pdf.getPage(pageNumber);
+  for (
+    let pageNumber = 1;
+    pageNumber <= pdf.numPages;
+    pageNumber++
+  ) {
 
-    const content = await page.getTextContent();
+    const page =
+      await pdf.getPage(
+        pageNumber
+      );
 
-    const pageText = content.items
-      .map(item => item.str || "")
-      .join(" ");
 
-    text += pageText + "\n";
+    const content =
+      await page.getTextContent();
+
+
+    const pageText =
+      content.items
+        .map(
+          item => item.str || ""
+        )
+        .join(" ");
+
+
+    text +=
+      pageText + "\n";
   }
+
 
   return text;
 }
 
 
-// ================================
-// DOCX TEXT EXTRACTION
-// ================================
+// ==========================================
+// DOCX
+// ==========================================
 
 async function extractDOCXText(file) {
 
@@ -186,203 +316,442 @@ async function extractDOCXText(file) {
     );
   }
 
-  const arrayBuffer = await file.arrayBuffer();
 
-  const result = await window.mammoth.extractRawText({
-    arrayBuffer
-  });
+  const buffer =
+    await file.arrayBuffer();
+
+
+  const result =
+    await window.mammoth.extractRawText({
+      arrayBuffer: buffer
+    });
+
 
   return result.value || "";
 }
 
 
-// ================================
-// LOAD EXTERNAL SCRIPT
-// ================================
+// ==========================================
+// LOAD SCRIPT
+// ==========================================
 
 function loadScript(src) {
 
-  return new Promise((resolve, reject) => {
+  return new Promise(
+    function (resolve, reject) {
 
-    const script = document.createElement("script");
+      const script =
+        document.createElement(
+          "script"
+        );
 
-    script.src = src;
 
-    script.onload = resolve;
+      script.src = src;
 
-    script.onerror = reject;
 
-    document.head.appendChild(script);
-  });
+      script.onload =
+        resolve;
+
+
+      script.onerror =
+        reject;
+
+
+      document.head.appendChild(
+        script
+      );
+    }
+  );
 }
 
 
-// ================================
+// ==========================================
 // ANALYZE BUTTON
-// ================================
+// ==========================================
 
-analyzeBtn.addEventListener("click", async () => {
+analyzeBtn.addEventListener(
+  "click",
+  async function () {
 
-  if (!selectedFile) {
-    showStatus("Please upload your resume first.", true);
-    return;
-  }
+    if (!selectedFile) {
 
-  if (!resumeText.trim()) {
-    showStatus(
-      "Your resume text could not be read. Please upload it again.",
-      true
-    );
-    return;
-  }
+      showStatus(
+        "Please upload your resume first.",
+        true
+      );
 
-  analyzeBtn.disabled = true;
-  analyzeBtn.textContent = "Analyzing...";
+      return;
+    }
 
-  showStatus("Analyzing your resume...");
 
-  try {
+    if (!resumeText) {
+
+      showStatus(
+        "Resume text could not be read.",
+        true
+      );
+
+      return;
+    }
+
 
     const jobDescription =
-      document.getElementById("jobDescription").value.trim();
+      document.getElementById(
+        "jobDescription"
+      ).value;
 
-    const result = analyzeResume(
-      resumeText,
-      jobDescription
-    );
+
+    analyzeBtn.disabled =
+      true;
+
+
+    analyzeBtn.querySelector(
+      "span:first-child"
+    ).textContent =
+      "Preparing analysis...";
+
+
+    await startLoading();
+
+
+    const result =
+      analyzeResume(
+        resumeText,
+        jobDescription
+      );
+
+
+    await delay(500);
+
+
+    hideLoading();
+
 
     displayReport(result);
 
-    document
-      .getElementById("reportSection")
-      .classList.remove("hidden");
 
-    document
-      .getElementById("reportSection")
-      .scrollIntoView({
-        behavior: "smooth"
-      });
-
-    showStatus("Analysis complete ✓");
-
-  } catch (error) {
-
-    console.error(error);
-
-    showStatus(
-      "Something went wrong while analyzing the resume.",
-      true
+    reportSection.classList.remove(
+      "hidden"
     );
 
-  } finally {
 
-    analyzeBtn.disabled = false;
-    analyzeBtn.textContent = "Analyze My Resume";
+    reportSection.scrollIntoView({
+      behavior: "smooth"
+    });
+
+
+    analyzeBtn.disabled =
+      false;
+
+
+    analyzeBtn.querySelector(
+      "span:first-child"
+    ).textContent =
+      "Analyze My Resume";
+
+
+    showStatus(
+      "Analysis complete ✓"
+    );
   }
-});
+);
 
 
-// ================================
-// RESUME ANALYZER
-// ================================
+// ==========================================
+// LOADING EXPERIENCE
+// ==========================================
 
-function analyzeResume(text, jobDescription) {
+async function startLoading() {
 
-  const lower = text.toLowerCase();
+  loadingSection.classList.remove(
+    "hidden"
+  );
 
-  // Common resume sections
+
+  reportSection.classList.add(
+    "hidden"
+  );
+
+
+  loadingSection.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+
+
+  const steps = [
+    {
+      id: "loadingStep1",
+      title: "Reading your resume...",
+      subtitle:
+        "Extracting your experience and skills."
+    },
+
+    {
+      id: "loadingStep2",
+      title: "Checking ATS structure...",
+      subtitle:
+        "Looking for important resume sections."
+    },
+
+    {
+      id: "loadingStep3",
+      title: "Matching keywords...",
+      subtitle:
+        "Comparing your resume with relevant terms."
+    },
+
+    {
+      id: "loadingStep4",
+      title: "Checking formatting...",
+      subtitle:
+        "Looking for common ATS formatting issues."
+    }
+  ];
+
+
+  for (
+    let i = 0;
+    i < steps.length;
+    i++
+  ) {
+
+    activateLoadingStep(
+      i
+    );
+
+
+    document.getElementById(
+      "loadingTitle"
+    ).textContent =
+      steps[i].title;
+
+
+    document.getElementById(
+      "loadingSubtitle"
+    ).textContent =
+      steps[i].subtitle;
+
+
+    await delay(
+      i === 0
+        ? 650
+        : 600
+    );
+  }
+}
+
+
+function activateLoadingStep(
+  index
+) {
+
+  for (
+    let i = 0;
+    i <= index;
+    i++
+  ) {
+
+    const element =
+      document.getElementById(
+        [
+          "loadingStep1",
+          "loadingStep2",
+          "loadingStep3",
+          "loadingStep4"
+        ][i]
+      );
+
+
+    if (!element) continue;
+
+
+    if (i < index) {
+
+      element.classList.remove(
+        "active"
+      );
+
+      element.classList.add(
+        "done"
+      );
+
+      element.querySelector(
+        "span"
+      ).textContent =
+        "✓";
+
+    } else {
+
+      element.classList.add(
+        "active"
+      );
+    }
+  }
+}
+
+
+function hideLoading() {
+
+  loadingSection.classList.add(
+    "hidden"
+  );
+}
+
+
+// ==========================================
+// ANALYZER
+// ==========================================
+
+function analyzeResume(
+  text,
+  jobDescription
+) {
+
+  const resume =
+    normalizeText(text);
+
+
+  // SECTIONS
+
   const sections = [
     "experience",
+    "work experience",
     "education",
     "skills",
     "projects",
     "summary",
+    "professional summary",
     "objective",
     "certifications"
   ];
 
-  const foundSections =
-    sections.filter(section =>
-      lower.includes(section)
+
+  const found =
+    sections.filter(
+      section =>
+        resume.includes(section)
     );
+
+
+  const uniqueSections =
+    [...new Set(found)];
+
 
   const sectionScore =
     Math.min(
       100,
       Math.round(
-        (foundSections.length / 5) * 100
+        uniqueSections.length /
+        5 *
+        100
       )
     );
 
 
-  // Contact information
+  // CONTACT
+
   const hasEmail =
-    /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(text);
+    /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i
+      .test(text);
+
 
   const hasPhone =
-    /(\+?\d[\d\s().-]{7,}\d)/.test(text);
+    /(?:\+?\d[\d\s().-]{7,}\d)/
+      .test(text);
+
 
   const hasLinkedIn =
-    lower.includes("linkedin");
+    resume.includes(
+      "linkedin"
+    );
+
 
   let contactScore = 0;
 
-  if (hasEmail) contactScore += 40;
-  if (hasPhone) contactScore += 40;
-  if (hasLinkedIn) contactScore += 20;
 
-  contactScore = Math.min(100, contactScore);
+  if (hasEmail)
+    contactScore += 40;
 
 
-  // Formatting / ATS signals
+  if (hasPhone)
+    contactScore += 40;
+
+
+  if (hasLinkedIn)
+    contactScore += 20;
+
+
+  // FORMAT
+
   let formatScore = 100;
 
-  if (text.length < 500) {
+
+  if (text.length < 500)
     formatScore -= 25;
-  }
 
-  if (text.length > 15000) {
+
+  if (text.length > 15000)
     formatScore -= 10;
-  }
-
-  if ((text.match(/[^\x00-\x7F]/g) || []).length > 100) {
-    formatScore -= 10;
-  }
-
-  formatScore = Math.max(0, formatScore);
 
 
-  // Job-specific keywords
+  formatScore =
+    Math.max(
+      0,
+      formatScore
+    );
+
+
+  // KEYWORDS
+
   let matchedKeywords = [];
+
   let missingKeywords = [];
+
   let keywordScore = 60;
 
-  if (jobDescription) {
 
-    const keywords = extractKeywords(jobDescription);
+  if (
+    jobDescription.trim()
+  ) {
+
+    const keywords =
+      extractKeywords(
+        jobDescription
+      );
+
 
     matchedKeywords =
-      keywords.filter(keyword =>
-        lower.includes(keyword.toLowerCase())
+      keywords.filter(
+        keyword =>
+          resume.includes(
+            normalizeText(keyword)
+          )
       );
+
 
     missingKeywords =
-      keywords.filter(keyword =>
-        !lower.includes(keyword.toLowerCase())
+      keywords.filter(
+        keyword =>
+          !resume.includes(
+            normalizeText(keyword)
+          )
       );
 
-    if (keywords.length > 0) {
 
-      keywordScore = Math.round(
-        (matchedKeywords.length / keywords.length) * 100
-      );
+    if (keywords.length) {
 
+      keywordScore =
+        Math.round(
+          matchedKeywords.length /
+          keywords.length *
+          100
+        );
     }
 
   } else {
 
-    // Without JD, check common professional keywords
-    const commonKeywords = [
+    const common = [
       "communication",
       "leadership",
       "management",
@@ -391,105 +760,146 @@ function analyzeResume(text, jobDescription) {
       "analysis",
       "development",
       "strategy",
-      "skills",
-      "experience"
+      "problem solving",
+      "skills"
     ];
 
+
     matchedKeywords =
-      commonKeywords.filter(keyword =>
-        lower.includes(keyword)
+      common.filter(
+        keyword =>
+          resume.includes(keyword)
       );
 
-    keywordScore = Math.round(
-      (matchedKeywords.length /
-        commonKeywords.length) * 100
-    );
+
+    keywordScore =
+      Math.round(
+        matchedKeywords.length /
+        common.length *
+        100
+      );
   }
 
 
-  // Problems
+  // PROBLEMS
+
   const problems = [];
 
+
   if (!hasEmail) {
+
     problems.push(
-      "Email address was not detected."
+      "No email address was detected."
     );
   }
+
 
   if (!hasPhone) {
+
     problems.push(
-      "Phone number was not detected."
+      "No phone number was detected."
     );
   }
 
-  if (foundSections.length < 4) {
+
+  if (
+    uniqueSections.length < 4
+  ) {
+
     problems.push(
       "Some standard resume sections may be missing."
     );
   }
 
+
   if (text.length < 500) {
+
     problems.push(
       "Very little resume text was detected."
     );
   }
 
-  if (jobDescription && missingKeywords.length > 0) {
+
+  if (
+    jobDescription.trim() &&
+    missingKeywords.length
+  ) {
+
     problems.push(
-      `${missingKeywords.length} job-related keywords are missing.`
+      missingKeywords.length +
+      " job-related keywords are missing."
     );
   }
 
-  if (problems.length === 0) {
+
+  if (!problems.length) {
+
     problems.push(
       "No major ATS problems were detected."
     );
   }
 
 
-  // Recommendations
+  // RECOMMENDATIONS
+
   const recommendations = [];
 
+
   if (!hasEmail) {
+
     recommendations.push(
       "Add a professional email address."
     );
   }
 
+
   if (!hasPhone) {
+
     recommendations.push(
-      "Add a phone number with country/area code."
+      "Add a phone number."
     );
   }
 
-  if (foundSections.length < 4) {
+
+  if (
+    uniqueSections.length < 4
+  ) {
+
     recommendations.push(
       "Use standard sections such as Experience, Education and Skills."
     );
   }
 
-  if (jobDescription && missingKeywords.length > 0) {
+
+  if (
+    jobDescription.trim() &&
+    missingKeywords.length
+  ) {
+
     recommendations.push(
-      "Naturally include relevant keywords from the job description."
+      "Naturally add relevant keywords from the job description."
     );
   }
 
-  recommendations.push(
-    "Use simple headings and avoid excessive graphics or tables."
-  );
 
   recommendations.push(
-    "Use achievement-focused bullet points where possible."
+    "Use simple headings and avoid excessive graphics, tables or columns."
   );
 
 
-  // Overall score
+  recommendations.push(
+    "Use achievement-focused bullet points with measurable results."
+  );
+
+
+  // SCORE
+
   const overallScore =
     Math.round(
-      keywordScore * 0.30 +
-      sectionScore * 0.25 +
-      contactScore * 0.20 +
-      formatScore * 0.25
+      keywordScore * .30 +
+      sectionScore * .25 +
+      contactScore * .20 +
+      formatScore * .25
     );
 
 
@@ -507,80 +917,108 @@ function analyzeResume(text, jobDescription) {
 }
 
 
-// ================================
-// KEYWORD EXTRACTION
-// ================================
+// ==========================================
+// KEYWORDS
+// ==========================================
 
 function extractKeywords(text) {
 
-  const stopWords = new Set([
-    "the",
-    "and",
-    "for",
-    "with",
-    "that",
-    "this",
-    "from",
-    "your",
-    "you",
-    "our",
-    "are",
-    "will",
-    "have",
-    "has",
-    "job",
-    "role",
-    "work",
-    "years",
-    "using",
-    "into",
-    "about",
-    "their",
-    "they",
-    "who",
-    "all",
-    "can",
-    "should"
-  ]);
+  const stopWords =
+    new Set([
+      "the",
+      "and",
+      "for",
+      "with",
+      "that",
+      "this",
+      "from",
+      "your",
+      "you",
+      "our",
+      "are",
+      "will",
+      "have",
+      "has",
+      "job",
+      "role",
+      "work",
+      "years",
+      "using",
+      "into",
+      "about",
+      "their",
+      "they",
+      "who",
+      "all",
+      "can",
+      "should",
+      "looking",
+      "required",
+      "responsibilities",
+      "candidate"
+    ]);
 
-  const words = text
-    .toLowerCase()
-    .replace(/[^a-z0-9+#.\s-]/g, " ")
-    .split(/\s+/)
-    .filter(word =>
-      word.length >= 3 &&
-      !stopWords.has(word)
-    );
+
+  const words =
+    normalizeText(text)
+      .replace(
+        /[^a-z0-9+#.\s-]/g,
+        " "
+      )
+      .split(/\s+/)
+      .filter(
+        word =>
+          word.length >= 3 &&
+          !stopWords.has(word)
+      );
+
 
   const frequency = {};
 
-  words.forEach(word => {
-    frequency[word] =
-      (frequency[word] || 0) + 1;
-  });
 
-  return Object.entries(frequency)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 30)
-    .map(item => item[0]);
+  words.forEach(
+    word => {
+
+      frequency[word] =
+        (frequency[word] || 0) + 1;
+    }
+  );
+
+
+  return Object.entries(
+    frequency
+  )
+    .sort(
+      (a,b) =>
+        b[1] - a[1]
+    )
+    .slice(0,30)
+    .map(
+      item =>
+        item[0]
+    );
 }
 
 
-// ================================
-// DISPLAY REPORT
-// ================================
+// ==========================================
+// DISPLAY
+// ==========================================
 
-function displayReport(result) {
+function displayReport(
+  result
+) {
 
-  setText(
+  animateNumber(
     "overallScore",
     result.overallScore
   );
 
-  setText(
+
+  animateNumber(
     "circleScore",
     result.overallScore
   );
+
 
   setText(
     "keywordScore",
@@ -624,15 +1062,84 @@ function displayReport(result) {
   );
 
 
-  let message = "Needs improvement before applying.";
+  const ring =
+    document.getElementById(
+      "scoreRing"
+    );
 
-  if (result.overallScore >= 80) {
-    message =
-      "Strong ATS readiness. A few improvements can make it better.";
-  } else if (result.overallScore >= 60) {
-    message =
-      "Good foundation, but improvements are recommended.";
+
+  if (ring) {
+
+    const circumference =
+      314;
+
+
+    const offset =
+      circumference -
+      (
+        result.overallScore /
+        100
+      ) *
+      circumference;
+
+
+    setTimeout(
+      function () {
+
+        ring.style.strokeDashoffset =
+          offset;
+
+      },
+      100
+    );
   }
+
+
+  let headline =
+    "Your resume needs some work.";
+
+
+  if (
+    result.overallScore >= 80
+  ) {
+
+    headline =
+      "Strong ATS readiness.";
+
+  } else if (
+    result.overallScore >= 60
+  ) {
+
+    headline =
+      "Good foundation — room to improve.";
+  }
+
+
+  setText(
+    "scoreHeadline",
+    headline
+  );
+
+
+  let message =
+    "Fix the highlighted issues before applying.";
+
+
+  if (
+    result.overallScore >= 80
+  ) {
+
+    message =
+      "Your resume looks well prepared for ATS screening.";
+
+  } else if (
+    result.overallScore >= 60
+  ) {
+
+    message =
+      "A few targeted improvements could strengthen your resume.";
+  }
+
 
   setText(
     "scoreMessage",
@@ -645,15 +1152,18 @@ function displayReport(result) {
     result.problems
   );
 
+
   renderList(
     "recommendationsList",
     result.recommendations
   );
 
+
   renderKeywords(
     "matchedKeywords",
     result.matchedKeywords
   );
+
 
   renderKeywords(
     "missingKeywords",
@@ -662,123 +1172,267 @@ function displayReport(result) {
 }
 
 
-// ================================
-// UI HELPERS
-// ================================
+// ==========================================
+// ANIMATE NUMBER
+// ==========================================
 
-function setText(id, value) {
-
-  const element =
-    document.getElementById(id);
-
-  if (element) {
-    element.textContent = value;
-  }
-}
-
-
-function setWidth(id, value) {
+function animateNumber(
+  id,
+  target
+) {
 
   const element =
     document.getElementById(id);
 
-  if (element) {
-    element.style.width =
-      `${Math.max(0, Math.min(100, value))}%`;
-  }
-}
-
-
-function renderList(id, items) {
-
-  const element =
-    document.getElementById(id);
 
   if (!element) return;
 
-  element.innerHTML = "";
 
-  items.forEach(item => {
+  let current = 0;
 
-    const li =
-      document.createElement("li");
 
-    li.textContent = item;
+  const duration = 900;
 
-    element.appendChild(li);
-  });
+  const start =
+    performance.now();
+
+
+  function update(
+    timestamp
+  ) {
+
+    const progress =
+      Math.min(
+        (timestamp - start) /
+        duration,
+        1
+      );
+
+
+    current =
+      Math.round(
+        target * progress
+      );
+
+
+    element.textContent =
+      current;
+
+
+    if (progress < 1) {
+
+      requestAnimationFrame(
+        update
+      );
+    }
+  }
+
+
+  requestAnimationFrame(
+    update
+  );
 }
 
 
-function renderKeywords(id, keywords) {
+// ==========================================
+// HELPERS
+// ==========================================
+
+function setText(
+  id,
+  value
+) {
 
   const element =
     document.getElementById(id);
 
+
+  if (element) {
+
+    element.textContent =
+      value;
+  }
+}
+
+
+function setWidth(
+  id,
+  value
+) {
+
+  const element =
+    document.getElementById(id);
+
+
+  if (element) {
+
+    setTimeout(
+      function () {
+
+        element.style.width =
+          Math.max(
+            0,
+            Math.min(
+              100,
+              value
+            )
+          ) + "%";
+
+      },
+      100
+    );
+  }
+}
+
+
+function renderList(
+  id,
+  items
+) {
+
+  const element =
+    document.getElementById(id);
+
+
   if (!element) return;
 
-  if (!keywords || keywords.length === 0) {
-    element.textContent = "None detected";
-    return;
-  }
 
   element.innerHTML = "";
 
-  keywords.forEach(keyword => {
 
-    const span =
-      document.createElement("span");
+  items.forEach(
+    item => {
 
-    span.textContent = keyword;
-
-    span.style.display = "inline-block";
-    span.style.margin = "4px";
-    span.style.padding = "5px 9px";
-    span.style.borderRadius = "8px";
-    span.style.background = "#f0efff";
-
-    element.appendChild(span);
-  });
-}
+      const li =
+        document.createElement(
+          "li"
+        );
 
 
-function showStatus(message, error = false) {
-
-  if (!statusEl) return;
-
-  statusEl.textContent = message;
-
-  statusEl.style.color =
-    error ? "#d93025" : "";
-}
+      li.textContent =
+        item;
 
 
-// ================================
-// ANALYZE ANOTHER
-// ================================
-
-if (analyzeAnother) {
-
-  analyzeAnother.addEventListener(
-    "click",
-    () => {
-
-      selectedFile = null;
-      resumeText = "";
-
-      fileInput.value = "";
-
-      fileName.textContent =
-        "PDF or DOCX • Max 5MB";
-
-      document.getElementById(
-        "reportSection"
-      ).classList.add("hidden");
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
+      element.appendChild(
+        li
+      );
     }
   );
 }
+
+
+function renderKeywords(
+  id,
+  keywords
+) {
+
+  const element =
+    document.getElementById(id);
+
+
+  if (!element) return;
+
+
+  if (
+    !keywords ||
+    !keywords.length
+  ) {
+
+    element.textContent =
+      "None detected";
+
+    return;
+  }
+
+
+  element.innerHTML = "";
+
+
+  keywords.forEach(
+    keyword => {
+
+      const span =
+        document.createElement(
+          "span"
+        );
+
+
+      span.textContent =
+        keyword;
+
+
+      element.appendChild(
+        span
+      );
+    }
+  );
+}
+
+
+function showStatus(
+  message,
+  error = false
+) {
+
+  if (!statusEl) return;
+
+
+  statusEl.textContent =
+    message;
+
+
+  statusEl.style.color =
+    error
+      ? "#ff6577"
+      : "";
+}
+
+
+function delay(
+  milliseconds
+) {
+
+  return new Promise(
+    resolve =>
+      setTimeout(
+        resolve,
+        milliseconds
+      )
+  );
+}
+
+
+// ==========================================
+// ANALYZE ANOTHER
+// ==========================================
+
+analyzeAnother.addEventListener(
+  "click",
+  function () {
+
+    selectedFile = null;
+
+    resumeText = "";
+
+    fileInput.value = "";
+
+    fileName.textContent =
+      "No file selected";
+
+
+    reportSection.classList.add(
+      "hidden"
+    );
+
+
+    loadingSection.classList.add(
+      "hidden"
+    );
+
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+);
