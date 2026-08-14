@@ -5,26 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>ResumeScore — Free ATS Resume Checker</title>
+
   <meta
     name="description"
     content="Check your resume's ATS readiness, keyword match, resume sections and job description compatibility."
   />
 
-  <link rel="stylesheet" href="style.css" />
+  <!-- IMPORTANT: actual GitHub filename is styles.css -->
+  <link rel="stylesheet" href="styles.css" />
 
   <!-- PDF reader -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs"
-    type="module"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs"
+    type="module">
+  </script>
 
   <!-- DOCX reader -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js">
+  </script>
 </head>
 
 <body>
 
 <header class="navbar">
   <div class="logo">Resume<span>Score</span></div>
-
   <a href="#how-it-works">How it works</a>
 </header>
 
@@ -55,10 +60,7 @@
     <!-- ANALYZER -->
     <div class="analyzer-card">
 
-      <div
-        class="upload-area"
-        id="uploadArea"
-      >
+      <div class="upload-area" id="uploadArea">
 
         <div class="upload-icon">↑</div>
 
@@ -91,7 +93,6 @@
         <label for="jobDescription">
           Want a job-specific score?
         </label>
-
         <span>Optional</span>
       </div>
 
@@ -165,6 +166,7 @@
       <div class="metric-card">
         <span>Keywords</span>
         <strong id="keywordScore">0</strong>
+
         <div class="progress">
           <div id="keywordBar"></div>
         </div>
@@ -173,6 +175,7 @@
       <div class="metric-card">
         <span>Sections</span>
         <strong id="sectionScore">0</strong>
+
         <div class="progress">
           <div id="sectionBar"></div>
         </div>
@@ -181,6 +184,7 @@
       <div class="metric-card">
         <span>Contact</span>
         <strong id="contactScore">0</strong>
+
         <div class="progress">
           <div id="contactBar"></div>
         </div>
@@ -189,6 +193,7 @@
       <div class="metric-card">
         <span>Formatting</span>
         <strong id="formatScore">0</strong>
+
         <div class="progress">
           <div id="formatBar"></div>
         </div>
@@ -271,7 +276,10 @@
         </p>
       </div>
 
-      <button type="button" onclick="alert('ATS Resume Builder coming soon!')">
+      <button
+        type="button"
+        onclick="alert('ATS Resume Builder coming soon!')"
+      >
         Improve My Resume →
       </button>
 
@@ -323,6 +331,7 @@
 </footer>
 
 
+<!-- PDF.js -->
 <script type="module">
 
   import * as pdfjsLib from
@@ -335,7 +344,9 @@
 
 </script>
 
-<script src="script.js"></script>
+
+<!-- IMPORTANT: actual GitHub filename is app.js -->
+<script src="app.js"></script>
 
 </body>
 </html>
